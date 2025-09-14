@@ -53,5 +53,25 @@ connection.onCompletion((_params): CompletionItem[] => {
 // Completion details
 connection.onCompletionResolve((item: CompletionItem): CompletionItem => item);
 
+// Generic handler to ignore any unimplemented requests and avoid errors
+const ignoreRequest = () => null;
+connection.onHover(ignoreRequest);
+connection.onSignatureHelp?.(ignoreRequest);
+connection.onDefinition?.(ignoreRequest);
+connection.onReferences?.(ignoreRequest);
+connection.onDocumentFormatting?.(ignoreRequest);
+connection.onDocumentRangeFormatting?.(ignoreRequest);
+connection.onDocumentSymbol?.(ignoreRequest);
+connection.onDocumentHighlight?.(ignoreRequest);
+connection.onTypeDefinition?.(ignoreRequest);
+connection.onImplementation?.(ignoreRequest);
+connection.onRenameRequest?.(ignoreRequest);
+connection.onPrepareRename?.(ignoreRequest);
+connection.onCodeAction?.(ignoreRequest);
+connection.onDocumentColor?.(ignoreRequest);
+connection.onColorPresentation?.(ignoreRequest);
+connection.onFoldingRanges?.(ignoreRequest);
+connection.onSelectionRanges?.(ignoreRequest);
+
 documents.listen(connection);
 connection.listen();
