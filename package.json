@@ -1,0 +1,42 @@
+{
+    "name": "graalscript-lsp",
+    "displayName": "GraalScript2 LSP",
+    "publisher": "ruanfernandes",
+    "version": "0.0.1",
+    "engines": {
+        "vscode": "^1.78.0"
+    },
+    "activationEvents": [
+        "onLanguage:graalscript"
+    ],
+    "main": "./out/client/extension.js",
+    "contributes": {
+        "languages": [
+            {
+                "id": "graalscript",
+                "aliases": [
+                    "graalscript",
+                    "GraalScript"
+                ],
+                "extensions": [
+                    ".txt"
+                ]
+            }
+        ]
+    },
+    "scripts": {
+        "compile": "tsc",
+        "watch": "tsc -w"
+    },
+    "dependencies": {
+        "@types/node": "^24.4.0",
+        "ts-node": "^10.9.2",
+        "vscode-languageclient": "^8.0.0",
+        "vscode-languageserver": "^8.0.0",
+        "vscode-languageserver-textdocument": "^1.0.12"
+    },
+    "devDependencies": {
+        "typescript": "^4.9.5",
+        "vscode": "1.1.37"
+    }
+}
