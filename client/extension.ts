@@ -32,11 +32,9 @@ export async function activate(context: vscode.ExtensionContext) {
         clientOptions
     );
 
-    // Só inicia o client se o arquivo ativo for graalscript
-    if (vscode.window.activeTextEditor?.document.languageId === 'graalscript') {
-        context.subscriptions.push(client);
-        await client.start();
-    }
+    // Inicia o client sempre que a janela de extensão for carregada
+    context.subscriptions.push(client);
+    await client.start();
 
     // Status bar item para mostrar se o LSP está rodando
     const statusBarItem = vscode.window.createStatusBarItem(
@@ -48,20 +46,52 @@ export async function activate(context: vscode.ExtensionContext) {
     statusBarItem.show();
     context.subscriptions.push(statusBarItem);
 
-    // Atualiza visibilidade do status ao trocar de editor
+    // Atualiza visibilidade do status ao trocar de editor e notifica o servidor
     vscode.window.onDidChangeActiveTextEditor(
         (editor) => {
             if (editor && editor.document.languageId === 'graalscript') {
-                if (!client.isRunning()) {
-                    client.start();
-                }
                 statusBarItem.show();
+                // envia conteúdo do documento ao servidor para atualizar cache local
+                client.sendNotification('workspace/didOpen', {
+                    uri: editor.document.uri.toString(),
+                    text: editor.document.getText(),
+                });
             } else {
-                if (client.isRunning()) {
-                    client.stop();
-                }
                 statusBarItem.hide();
             }
+        },
+        null,
+        context.subscriptions
+    );
+
+    // Notifica servidor quando documentos são abertos/fechados/alterados
+    vscode.workspace.onDidOpenTextDocument(
+        (doc) => {
+            client.sendNotification('workspace/didOpen', {
+                uri: doc.uri.toString(),
+                text: doc.getText(),
+            });
+        },
+        null,
+        context.subscriptions
+    );
+
+    vscode.workspace.onDidChangeTextDocument(
+        (e) => {
+            client.sendNotification('workspace/didChange', {
+                uri: e.document.uri.toString(),
+                text: e.document.getText(),
+            });
+        },
+        null,
+        context.subscriptions
+    );
+
+    vscode.workspace.onDidCloseTextDocument(
+        (doc) => {
+            client.sendNotification('workspace/didClose', {
+                uri: doc.uri.toString(),
+            });
         },
         null,
         context.subscriptions
